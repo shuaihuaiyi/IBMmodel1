@@ -15,6 +15,8 @@ class IBMModel1:
     self.t = torch.full((len(src_vocab), len(tgt_vocab)), 1 / len(tgt_vocab))
   
   def step(self, data):
+    # M-step
+    # todo 优化M步的执行效率
     count = torch.zeros_like(self.t)
     total = torch.zeros(len(self.src_vocab))
     s_total = torch.zeros(len(self.tgt_vocab))
@@ -29,6 +31,8 @@ class IBMModel1:
           count[src_word][tgt_word] += self.t[src_word][tgt_word] / s_total[tgt_word]
           total[src_word] += self.t[src_word][tgt_word] / s_total[tgt_word]
     
-    for src_word in self.src_vocab:
-      for tgt_word in self.tgt_vocab:
-        self.t[src_word][tgt_word] = count[src_word][tgt_word] / total[src_word]
+    # E-step
+    # for src_word in self.src_vocab:
+    #   for tgt_word in self.tgt_vocab:
+    #     self.t[src_word][tgt_word] = count[src_word][tgt_word] / total[src_word]
+    self.t = (count.transpose(0, 1) / total).transpose(0, 1)
